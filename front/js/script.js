@@ -4,10 +4,10 @@ let products = [];
 
 // fonction qui récupére les données des produits dans l'api mise a disposition
 async function getProducts () {
-   await fetch("http://localhost:3000/api/products")
+   await fetch("http://localhost:3000/api/products/")
     .then((res) => res.json())
     .then((data) => (products = data))
-    .catch(err => console.log("erreur lors du chargement du fichier", err));
+    .catch(err => console.log("erreur lors du chargement des produits", err));
 }
 
 /* fonction qui appelle la fonction de récupération de données et qui
