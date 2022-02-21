@@ -1,4 +1,4 @@
-// variable qui va contenir la liste des produits dans un array
+// variable globale qui va contenir la liste des produits dans un array
 let products = [];
 
 
