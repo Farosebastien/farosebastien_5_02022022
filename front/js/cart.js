@@ -69,12 +69,7 @@ function displayingProducts() {
     divContentSettingsQuantity.setAttribute("class", "cart__item__content__settings__quantity");
     divContentSettings.appendChild(divContentSettingsQuantity);
 
-    //affichage de la quantité désirée
-    let productQuantity = document.createElement("p");
-    productQuantity.innerText = `Qté : ${cart[i].quantity}`;
-    divContentSettingsQuantity.appendChild(productQuantity);
-
-    //input pour la modification de la quantité
+    //affichage de la  quantité désirée dans un input pour la modification
     let productQuantityInput = document.createElement("input");
     productQuantityInput.setAttribute("type", "number");
     productQuantityInput.setAttribute("class", "itemQuantity");
@@ -95,10 +90,26 @@ function displayingProducts() {
     divContentSettingsDelete.appendChild(deleteProduct);
 }
 
-
+function modifyQuantity() {
+    let quantityInput = document.querySelectorAll("input")
+    for (let j= 0; j < localStorage.lenght; j++) {
+        quantityInput.addEventListener("change", function(e) {
+            let article = quantityInput.closest("article");
+            let temporaryCart = JSON.parse(localStorage.getItem("cart"));
+            for (let k = 0; k < localStorage.length; k++) {
+                if (article.dataset.id == temporaryCart[k].id){
+                    temporaryCart.quantity = e.target.value;
+                    localStorage["j.quantity"] = temporaryCart.quantity;
+                    getProductById();
+                }
+            }
+        });
+    }   
+}
 
 async function main() {
     await getProductById();
+    modifyQuantity();
     let totalQuantitySpan = document.getElementById("totalQuantity");
     totalQuantitySpan.innerText = totalQuantity;
     let totalPriceSpan = document.getElementById("totalPrice");
