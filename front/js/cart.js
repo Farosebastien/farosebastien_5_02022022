@@ -1,22 +1,12 @@
 // déclaration des variables globales
-let cart = [];
 let localCart = [];
 let productById = 0;
-let totalQuantity = 0;
-let totalPrice = 0;
-let i = 0;
 let cartItems = document.getElementById("cart__items");
-let totalQuantitySpan = document.getElementById("totalQuantity");
-let totalPriceSpan = document.getElementById("totalPrice");
-
-
 
 // fonction de récupération du localstorage et de chaque produit du panier en fonction de son id
 async function getProductById() {
-    cart = JSON.parse(localStorage.getItem("cart"));
-    if (cart.length < 1){
-        alert("votre panier est vide");
-    } else {
+    let cart = JSON.parse(localStorage.getItem("cart"));
+    if (cart) {
         for (localCart of cart) {
             await fetch(`http://localhost:3000/api/products/${localCart.id}`)
             .then((res) => res.json())
@@ -25,19 +15,16 @@ async function getProductById() {
             displayingProducts();
             calc();
         }
-    }
-    
-}
-function calc() {
-    totalQuantity += localCart.quantity;
-    totalPrice += (productById.price * localCart.quantity);
-    totalQuantitySpan.innerText = totalQuantity;
-    totalPriceSpan.innerText = totalPrice;
+    } else {
+        alert("votre panier est vide");
+    }     
 }
 
-async function recalc() {
-    totalQuantity = 0;
-    totalPrice = 0;
+async function calc() {
+    let totalQuantitySpan = document.getElementById("totalQuantity");
+    let totalPriceSpan = document.getElementById("totalPrice");
+    let totalQuantity = 0;
+    let totalPrice = 0;
     let modifyCart = JSON.parse(localStorage.getItem("cart"));
     for ( let j = 0; j < modifyCart.length; j++) {
         await fetch(`http://localhost:3000/api/products/${modifyCart[j].id}`)
@@ -48,9 +35,14 @@ async function recalc() {
         totalPrice += (article.price * modifyCart[j].quantity);
         totalQuantitySpan.innerText = totalQuantity;
         totalPriceSpan.innerText = totalPrice;
-    }  
+    }
+    if (totalQuantity == 0) {
+        alert("votre panier va être vide");
+        totalQuantitySpan.innerText = totalQuantity;
+        totalPriceSpan.innerText = totalPrice;
+        localStorage.clear();
+    }
 }
-
 
 //fonction d'affichage des produits dans le dom
 function displayingProducts() {
@@ -123,39 +115,44 @@ function displayingProducts() {
     let deleteProduct = document.createElement("p");
     deleteProduct.setAttribute("class", "deleteItem");
     deleteProduct.innerText = "Supprimer";
-    deleteProduct.addEventListener("click", function(event) { 
-        for ( let i = 0; i < cart.length; i++) {
-            if (cart[i].id == productArticle.dataset.id && cart[i].color == productArticle.dataset.color){
-                let filteredcart = cart.filter(function(itemToRemove) {
-                    return itemToRemove.id != cart[i].id  || itemToRemove.color != cart[i].color;
-                });
-                cart = filteredcart;
-                localStorage.setItem("cart", JSON.stringify(cart));
-                recalc();
-            }
-        }
-        cartItems.removeChild(productArticle);
-    });
     divContentSettingsDelete.appendChild(deleteProduct);
 }
-function changeQuantity (){
+
+function changeQuantity() {
     let quantityItems = document.querySelectorAll(".itemQuantity");
     let cartForQuantity = JSON.parse(localStorage.getItem("cart")); 
     for ( let k = 0; k < quantityItems.length; k++) {
         quantityItems[k].addEventListener("change", function(e){
-            cartForQuantity[k].quantity = e.target.value;
-            totalPrice = 0;
-            totalQuantity = 0;
+            cartForQuantity[k].quantity = parseInt(e.target.value);
             localStorage.setItem("cart", JSON.stringify(cartForQuantity));
             calc();
         });
     }
 }
 
+function deleteItem() {
+    let  articleToDelete = document.querySelectorAll(".cart__item");
+    let deleteButtons = document.querySelectorAll(".deleteItem");
+    let cartForDelete = JSON.parse(localStorage.getItem("cart"));
+    for (let i = 0; i < articleToDelete.length; i++) {
+        let dataId = cartForDelete[i].id;
+        let colorId = cartForDelete[i].color;
+        deleteButtons[i].addEventListener("click", function(event){
+            let filteredcart = cartForDelete.filter(function(itemToRemove) {
+                return itemToRemove.id != dataId  || itemToRemove.color != colorId;
+            });
+            cartForDelete = filteredcart;
+            localStorage.setItem("cart", JSON.stringify(cartForDelete));
+            cartItems.removeChild(articleToDelete[i]);
+            calc();
+        });
+    } 
+}
 
 async function main() {
     await getProductById(); 
     changeQuantity();
+    deleteItem();
 }
 
 main();
