@@ -267,7 +267,7 @@ function getOrderId() {
             }       
         }
         //si on a au moins un article et que le formulaire est ok
-        if (product && formIsValid) {
+        if (cartForFetch && formIsValid) {
             //on envoie un fetch post à l'api
             e.preventDefault();
             fetch("http://localhost:3000/api/products/order", {
