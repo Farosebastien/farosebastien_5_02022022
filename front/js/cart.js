@@ -141,11 +141,15 @@ function changeQuantity() {
             const quantityItem = quantityItems[i];
             let newQuantity = cartForQuantity[i];
             quantityItem.addEventListener("change", function(e){
-                newQuantity.quantity = parseInt(e.target.value);
+                if (e.target.value > 0 && e.target.value < 101){
+                    newQuantity.quantity = parseInt(e.target.value);
                 cartForDelete = cartForQuantity;
                 cart = cartForQuantity;
                 localStorage.setItem("cart", JSON.stringify(cartForQuantity));
                 calc();
+                } else {
+                    alert("La quantité doit être comprise entre 1 et 100");
+                }   
             });
         }
     }
